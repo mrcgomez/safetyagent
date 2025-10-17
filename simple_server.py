@@ -686,8 +686,17 @@ def load_safety_manual():
     try:
         # First try to load from environment variable (more secure)
         safety_manual_json = os.getenv('SAFETY_MANUAL_JSON')
+        safety_manual_compressed = os.getenv('SAFETY_MANUAL_COMPRESSED')
         
-        if safety_manual_json:
+        if safety_manual_compressed:
+            logger.info("Loading Safety Manual from compressed environment variable...")
+            import gzip
+            import base64
+            # Decompress the data
+            compressed_data = base64.b64decode(safety_manual_compressed)
+            decompressed_json = gzip.decompress(compressed_data).decode('utf-8')
+            safety_data = json.loads(decompressed_json)
+        elif safety_manual_json:
             logger.info("Loading Safety Manual from environment variable...")
             safety_data = json.loads(safety_manual_json)
         else:
