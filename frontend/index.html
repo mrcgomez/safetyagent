@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafetyAgent AI - Safety Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+    <!-- Main Application -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🛡️</span>
+                    <h1>SafetyAgent AI</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="upload-btn" class="btn btn-secondary">
+                        <span class="btn-icon">📄</span>
+                        Upload Document
+                    </button>
+                    <button id="stats-btn" class="btn btn-secondary">
+                        <span class="btn-icon">📊</span>
+                        Statistics
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <div class="welcome-section">
+                <div class="welcome-content">
+                    <h2>Welcome to SafetyAgent AI</h2>
+                    <p>Your intelligent safety knowledge base assistant. Ask questions about safety procedures, regulations, and best practices based on your uploaded safety documents.</p>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🤖</div>
+                            <h3>AI-Powered</h3>
+                            <p>Advanced AI that understands your safety documents and provides accurate, contextual answers.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📚</div>
+                            <h3>Document Processing</h3>
+                            <p>Upload Word documents, PDFs, and text files. The system automatically processes and indexes them.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3>Smart Search</h3>
+                            <p>Find relevant information quickly with semantic search across all your safety documents.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">💬</div>
+                            <h3>Chat Interface</h3>
+                            <p>Natural language conversations with source citations and confidence scoring.</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-start">
+                        <h3>Quick Start</h3>
+                        <ol>
+                            <li>Click the chat icon in the bottom-left corner</li>
+                            <li>Upload your safety documents using the upload button</li>
+                            <li>Start asking questions about safety procedures</li>
+                            <li>Get instant, accurate answers with source references</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2024 SafetyAgent AI - Intelligent Safety Knowledge Base</p>
+        </footer>
+    </div>
+
+    <!-- Floating Chat Widget -->
+    <div id="chat-widget" class="chat-widget">
+        <!-- Chat Toggle Button -->
+        <button id="chat-toggle" class="chat-toggle">
+            <span class="chat-icon">💬</span>
+            <span class="chat-badge" id="chat-badge" style="display: none;">1</span>
+        </button>
+
+        <!-- Chat Window -->
+        <div id="chat-window" class="chat-window">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-title">
+                    <span class="chat-avatar">🛡️</span>
+                    <div class="chat-info">
+                        <h3>SafetyAgent AI</h3>
+                        <span class="chat-status">Online</span>
+                    </div>
+                </div>
+                <div class="chat-controls">
+                    <button id="chat-minimize" class="chat-control-btn">−</button>
+                    <button id="chat-close" class="chat-control-btn">×</button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="chat-messages">
+                <div class="message ai-message">
+                    <div class="message-avatar">🛡️</div>
+                    <div class="message-content">
+                        <div class="message-text">
+                            Hello! I'm SafetyAgent AI, your safety knowledge assistant. I can help you with questions about safety procedures, regulations, and best practices based on your uploaded documents.
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" placeholder="Ask me about safety procedures..." class="chat-input">
+                    <button id="chat-send" class="chat-send-btn">
+                        <span class="send-icon">➤</span>
+                    </button>
+                </div>
+                <div class="chat-suggestions">
+                    <button class="suggestion-btn" data-query="What are the general safety requirements?">General Safety</button>
+                    <button class="suggestion-btn" data-query="What PPE is required?">PPE Requirements</button>
+                    <button class="suggestion-btn" data-query="How do I report an incident?">Incident Reporting</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Safety Document</h2>
+                <button id="upload-close" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <div class="upload-icon">📄</div>
+                        <p>Drag and drop files here or click to browse</p>
+                        <input type="file" id="file-input" multiple accept=".docx,.doc,.pdf,.txt,.md" style="display: none;">
+                        <button id="browse-files" class="btn btn-primary">Browse Files</button>
+                    </div>
+                </div>
+                
+                <div class="upload-options">
+                    <div class="form-group">
+                        <label for="category-select">Category:</label>
+                        <select id="category-select" class="form-select">
+                            <option value="safety_manual">Safety Manual</option>
+                            <option value="procedures">Procedures</option>
+                            <option value="regulations">Regulations</option>
+                            <option value="training">Training Materials</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="upload-progress" class="upload-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p class="progress-text">Processing document...</p>
+                </div>
+
+                <div id="uploaded-files" class="uploaded-files">
+                    <h3>Uploaded Documents</h3>
+                    <div id="file-list" class="file-list">
+                        <!-- Uploaded files will be listed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>System Statistics</h2>
+                <button id="stats-close" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="stats-content" class="stats-content">
+                    <div class="loading">Loading statistics...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
