@@ -4,6 +4,7 @@
 # Sensitive safety documents (keep private)
 safety_manual.json
 EmployeeSafetyManual.docx
+compressed_safety_manual.txt
 *.docx
 *.doc
 
