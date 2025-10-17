@@ -682,68 +682,75 @@ async def health_check():
     return {"status": "healthy", "documents": stats['total_documents'], "chunks": stats['total_chunks']}
 
 def load_safety_manual():
-    """Load the safety manual from JSON if it exists"""
-    json_path = "safety_manual.json"
-    if os.path.exists(json_path):
-        try:
-            logger.info("Loading Safety Manual from JSON...")
+    """Load the safety manual from environment variable or JSON file"""
+    try:
+        # First try to load from environment variable (more secure)
+        safety_manual_json = os.getenv('SAFETY_MANUAL_JSON')
+        
+        if safety_manual_json:
+            logger.info("Loading Safety Manual from environment variable...")
+            safety_data = json.loads(safety_manual_json)
+        else:
+            # Fallback to JSON file
+            json_path = "safety_manual.json"
+            if not os.path.exists(json_path):
+                logger.error(f"❌ Safety manual not found in environment variable or file: {json_path}")
+                return
             
-            # Load JSON data
+            logger.info("Loading Safety Manual from JSON file...")
             with open(json_path, 'r', encoding='utf-8') as f:
                 safety_data = json.load(f)
             
-            logger.info(f"Loaded JSON with {safety_data['metadata']['total_chunks']} chunks")
-            
-            # Create document metadata
-            doc_id = "safety_manual"
-            metadata = {
-                'doc_id': doc_id,
-                'filename': safety_data['metadata']['source_file'],
-                'category': 'safety_manual',
-                'file_size': os.path.getsize(json_path),
-                'text_length': safety_data['metadata']['total_characters'],
-                'extraction_date': safety_data['metadata']['extraction_date']
-            }
-            
-            # Convert JSON chunks to our format
-            chunks = []
-            for i, chunk_data in enumerate(safety_data['chunks']):
-                chunk = {
-                    'id': chunk_data['id'],
-                    'text': chunk_data['content'],
-                    'metadata': {
-                        **metadata,
-                        'chunk_index': i,
-                        'title': chunk_data['title'],
-                        'word_count': chunk_data['word_count']
-                    }
+        logger.info(f"Loaded JSON with {safety_data['metadata']['total_chunks']} chunks")
+        
+        # Create document metadata
+        doc_id = "safety_manual"
+        metadata = {
+            'doc_id': doc_id,
+            'filename': safety_data['metadata']['source_file'],
+            'category': 'safety_manual',
+            'file_size': len(safety_manual_json) if safety_manual_json else os.path.getsize(json_path),
+            'text_length': safety_data['metadata']['total_characters'],
+            'extraction_date': safety_data['metadata']['extraction_date'],
+            'source': 'environment' if safety_manual_json else 'file'
+        }
+        
+        # Convert JSON chunks to our format
+        chunks = []
+        for i, chunk_data in enumerate(safety_data['chunks']):
+            chunk = {
+                'id': chunk_data['id'],
+                'text': chunk_data['content'],
+                'metadata': {
+                    **metadata,
+                    'chunk_index': i,
+                    'title': chunk_data['title'],
+                    'word_count': chunk_data['word_count']
                 }
-                chunks.append(chunk)
-            
-            # Store in knowledge base
-            knowledge_base[doc_id] = {
-                'metadata': metadata,
-                'chunks': chunks,
-                'full_text': safety_data['full_text'],
-                'sections': safety_data['sections']
             }
-            
-            # Update stats
-            stats['total_documents'] = 1
-            stats['total_chunks'] = len(chunks)
-            stats['categories'] = ['safety_manual']
-            
-            logger.info(f"✅ Safety manual loaded from JSON: {len(chunks)} chunks")
-            logger.info(f"📊 Knowledge base now has {len(knowledge_base)} documents")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Error loading safety manual from JSON: {e}")
-            import traceback
-            traceback.print_exc()
-            return False
-    else:
-        logger.warning(f"Safety manual JSON not found at {json_path}")
+            chunks.append(chunk)
+        
+        # Store in knowledge base
+        knowledge_base[doc_id] = {
+            'metadata': metadata,
+            'chunks': chunks,
+            'full_text': safety_data['full_text'],
+            'sections': safety_data['sections']
+        }
+        
+        # Update stats
+        stats['total_documents'] = 1
+        stats['total_chunks'] = len(chunks)
+        stats['categories'] = ['safety_manual']
+        
+        logger.info(f"✅ Safety manual loaded: {len(chunks)} chunks")
+        logger.info(f"📊 Knowledge base now has {len(knowledge_base)} documents")
+        return True
+        
+    except Exception as e:
+        logger.error(f"❌ Error loading safety manual: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 if __name__ == "__main__":

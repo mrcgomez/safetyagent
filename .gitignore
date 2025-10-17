@@ -1,6 +1,12 @@
 # Environment variables
 .env
 
+# Sensitive safety documents (keep private)
+safety_manual.json
+EmployeeSafetyManual.docx
+*.docx
+*.doc
+
 # Python
 __pycache__/
 *.py[cod]
